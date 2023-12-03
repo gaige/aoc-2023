@@ -2,7 +2,19 @@ import Algorithms
 import Foundation
 
 struct GameCubes {
-    let red,green,blue:Int;
+    var red,green,blue:Int;
+    func power() -> Int {
+        var power = 1
+        if self.red > 0 { power *= self.red }
+        if self.green > 0 { power *= self.green }
+        if self.blue > 0 { power *= self.blue }
+        return power
+    }
+    
+    static func cube_max( _ left: GameCubes, _ right: GameCubes) -> GameCubes {
+        GameCubes(red: max(left.red,right.red), green: max(left.green,right.green), blue: max(left.blue,right.blue))
+    }
+    
 }
 
 struct Game {
@@ -22,17 +34,14 @@ struct Day02: AdventDay {
             var moves: [GameCubes] = []
             for move_data in game_info[1].split(separator: ";") {
                 for color_data in move_data.split(separator: ",") {
-                    var red = 0
-                    var blue = 0
-                    var green = 0
+                    var cube = GameCubes(red: 0, green: 0, blue: 0)
                     let color_map = color_data.split(separator: " ")
                     switch color_map[1] {
-                    case "red": red = Int(color_map[0])!
-                    case "blue": blue = Int(color_map[0])!
-                    case "green": green = Int(color_map[0])!
+                    case "red": cube.red = Int(color_map[0])!
+                    case "blue": cube.blue = Int(color_map[0])!
+                    case "green": cube.green = Int(color_map[0])!
                     default: print("unexpected")
                     }
-                    let cube = GameCubes(red: red, green: green, blue: blue)
                     moves += [cube]
                 }
             }
@@ -43,15 +52,13 @@ struct Day02: AdventDay {
   // Replace this with your solution for the first part of the day's challenge.
   func part1() -> Any {
     // Calculate the sum of the first set of input data
-      let max_red = 12
-      let max_green = 13
-      let max_blue = 14
+      let max = GameCubes(red: 12, green: 13, blue: 14)
       return games.reduce(0, {
           var ok = true
           for move in $1.moves {
-              if move.red > max_red { ok = false}
-              if move.blue > max_blue { ok = false}
-              if move.green > max_green { ok = false}
+              if move.red > max.red { ok = false}
+              if move.blue > max.blue { ok = false}
+              if move.green > max.green { ok = false}
           }
           if ok { return $0 + $1.number }
           return $0
@@ -61,20 +68,9 @@ struct Day02: AdventDay {
   // Replace this with your solution for the second part of the day's challenge.
   func part2() -> Any {
       return games.reduce(0, {
-          var max_red = 0
-          var max_green = 0
-          var max_blue = 0
-          var power = 1
-          for move in $1.moves {
-              if move.red > max_red { max_red = move.red }
-              if move.blue > max_blue { max_blue = move.blue }
-              if move.green > max_green { max_green = move.green }
-          }
-          if max_red > 0 { power *= max_red }
-          if max_green > 0 { power *= max_green }
-          if max_blue > 0 { power *= max_blue }
+          let max_cubes = $1.moves.reduce(GameCubes(red: 0, green: 0, blue: 0), GameCubes.cube_max)
 
-          return $0 + power
+          return $0 + max_cubes.power()
       })
   }
 }
