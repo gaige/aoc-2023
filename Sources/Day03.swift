@@ -7,7 +7,7 @@ struct Day03: AdventDay {
 
     var lines: [String] 
     
-    struct PartLocation {
+    struct PartLocation:Equatable {
         let x,y: Int
         let symbol: String
     }
@@ -61,39 +61,67 @@ struct Day03: AdventDay {
         return candidates
     }
     
-  // Replace this with your solution for the first part of the day's challenge.
+    func findParts() -> [Part] {
+        // search for part locations (line, column) containing not '.' or \d  -> Part(x,y)
+        do {
+            // scan each input line for part numbers
+            let partno_regex = try Regex(#"(\d+)"#)
+            var parts: [Part] = []
+            for line_no in 0..<lines.count {
+                let line = lines[line_no]
+                let result = line.matches(of: partno_regex)
+                for match in result {
+                    assert(!match.range.contains(match.range.upperBound))
+                    let locations = findAdjacentPart(xRange:match.range.lowerBound.utf16Offset(in: line)..<match.range.upperBound.utf16Offset(in: line), y:line_no)
+                    for location in locations {
+                        let part = Part(number: Int(String(match.output[0].substring!))!, location: location)
+                        parts += [part]
+                    }
+                }
+            }
+            // with line number and position (range.start->end)
+            //    look for parts that are adjacent (within 1 x,y) of part number
+            return parts
+        } catch {
+            return []
+        }
+    }
+    
+  // add up the parts numbers
   func part1() -> Any {
-      // search for part locations (line, column) containing not '.' or \d  -> Part(x,y)
-      do {
-          // scan each input line for part numbers
-          let partno_regex = try Regex(#"(\d+)"#)
-          var parts: [Part] = []
-          for line_no in 0..<lines.count {
-              let line = lines[line_no]
-              let result = line.matches(of: partno_regex)
-              for match in result {
-                  assert(!match.range.contains(match.range.upperBound))
-                  let locations = findAdjacentPart(xRange:match.range.lowerBound.utf16Offset(in: line)..<match.range.upperBound.utf16Offset(in: line), y:line_no)
-                  for location in locations {
-                      let part = Part(number: Int(String(match.output[0].substring!))!, location: location)
-                      parts += [part]
-                  }
-              }
-          }
-          // with line number and position (range.start->end)
-          //    look for parts that are adjacent (within 1 x,y) of part number
-
-          // Calculate the sum of the first set of input data
-          return parts.reduce(0) { partialResult, part in
-              partialResult + part.number
-          }
-      } catch {
-          return 0
+      let parts = findParts()
+      return parts.reduce(0) { partialResult, part in
+          partialResult + part.number
       }
   }
 
-  // Replace this with your solution for the second part of the day's challenge.
+    struct Gear {
+        let one,two: Part
+        var ratio : Int {
+            one.number * two.number
+        }
+    }
+    
+  // Find gears (exactly 2 part numbers)
+  // mulitply part numbers to get the ration
+  // return the sum
   func part2() -> Any {
-      return 0
+      let parts = findParts()
+      
+      // locate all partLocations with 2 parts claiming it
+      var gears : [Gear] = []
+      
+      for location in partLocations {
+          let parts = parts.filter { part in
+              part.location == location
+          }
+          if parts.count == 2 {
+              gears += [Gear(one: parts[0], two: parts[1])]
+          }
+      }
+      
+      return gears.reduce(0) { partialResult, gear in
+          partialResult+gear.ratio
+      }
   }
 }

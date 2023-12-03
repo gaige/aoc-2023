@@ -155,12 +155,12 @@ final class Day03Tests: XCTestCase {
     // 293693 is too low
     // 323676 is too low
     // 566997 is too high
-    XCTAssertEqual(String(describing: challenge.part1()), "2265")
+    XCTAssertEqual(String(describing: challenge.part1()), "517021")
   }
 
   func testPart2() throws {
     let challenge = Day03(data: testData)
-    XCTAssertEqual(String(describing: challenge.part2()), "64097")
+    XCTAssertEqual(String(describing: challenge.part2()), "81296995")
   }
     
 }
