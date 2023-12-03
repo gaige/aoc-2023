@@ -15,6 +15,14 @@ struct GameCubes {
         GameCubes(red: max(left.red,right.red), green: max(left.green,right.green), blue: max(left.blue,right.blue))
     }
     
+    static public func <(a:GameCubes, b:GameCubes) -> Bool {
+        a.red <= b.red && a.green <= b.green && a.blue <= b.blue
+    }
+
+    static public func >(a:GameCubes, b:GameCubes) -> Bool {
+        a.red > b.red || a.green > b.green || a.blue > b.blue
+    }
+
 }
 
 struct Game {
@@ -56,9 +64,7 @@ struct Day02: AdventDay {
       return games.reduce(0, {
           var ok = true
           for move in $1.moves {
-              if move.red > max.red { ok = false}
-              if move.blue > max.blue { ok = false}
-              if move.green > max.green { ok = false}
+              if move > max { ok = false }
           }
           if ok { return $0 + $1.number }
           return $0
