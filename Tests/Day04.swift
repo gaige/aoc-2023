@@ -225,7 +225,7 @@ Card 209: 61  7  9 81 20 54 92 74 53 63 | 85  4 79 68 58 91 90 71 50 30 65 17 18
 
   func testPart2() throws {
     let challenge = Day04(data: testData)
-    XCTAssertEqual(String(describing: challenge.part2()), "54094")
+    XCTAssertEqual(String(describing: challenge.part2()), "5095824")
   }
     
   func testStrings() throws {
